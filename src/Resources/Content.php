@@ -26,14 +26,14 @@ class Content
         $this->ensureArrayOfType($parts, PartInterface::class);
     }
 
-    public function addText(string $text): self
+    public function addText(string $text) : self
     {
         $this->parts[] = new TextPart($text);
 
         return $this;
     }
 
-    public function addImage(MimeType $mimeType, string $image): self
+    public function addImage(MimeType $mimeType, string $image) : self
     {
         $this->parts[] = new ImagePart($mimeType, $image);
 
@@ -43,7 +43,7 @@ class Content
     public static function text(
         string $text,
         Role $role = Role::User,
-    ): self {
+    ) : self {
         return new self(
             [
                 new TextPart($text),
@@ -56,7 +56,7 @@ class Content
         MimeType $mimeType,
         string $image,
         Role $role = Role::User
-    ): self {
+    ) : self {
         return new self(
             [
                 new ImagePart($mimeType, $image),
@@ -70,7 +70,7 @@ class Content
         MimeType $mimeType,
         string $image,
         Role $role = Role::User,
-    ): self {
+    ) : self {
         return new self(
             [
                 new TextPart($text),
@@ -80,6 +80,7 @@ class Content
         );
     }
 
+
     /**
      * @param array{
      *     parts: array<int, array{text?: string, inlineData?: array{mimeType: string, data: string}}>,
@@ -87,15 +88,15 @@ class Content
      * } $content
      * @return self
      */
-    public static function fromArray(array $content): self
+    public static function fromArray(array $content) : self
     {
         $parts = [];
         foreach ($content['parts'] as $part) {
-            if (!empty($part['text'])) {
+            if (! empty($part['text'])) {
                 $parts[] = new TextPart($part['text']);
             }
 
-            if (!empty($part['inlineData'])) {
+            if (! empty($part['inlineData'])) {
                 $mimeType = MimeType::from($part['inlineData']['mimeType']);
                 $parts[] = new ImagePart($mimeType, $part['inlineData']['data']);
             }

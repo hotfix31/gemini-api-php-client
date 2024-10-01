@@ -6,6 +6,7 @@ namespace GeminiAPI\Requests;
 
 use GeminiAPI\Enums\ModelName;
 use GeminiAPI\GenerationConfig;
+use GeminiAPI\Resources\Tool;
 use GeminiAPI\SafetySetting;
 use GeminiAPI\Traits\ArrayTypeValidator;
 use GeminiAPI\Resources\Content;
@@ -20,12 +21,14 @@ class GenerateContentRequest implements JsonSerializable, RequestInterface
     /**
      * @param ModelName $modelName
      * @param Content[] $contents
+     * @param Tool[] $tools
      * @param SafetySetting[] $safetySettings
      * @param GenerationConfig|null $generationConfig
      */
     public function __construct(
         public readonly ModelName $modelName,
         public readonly array $contents,
+        public readonly array $tools = [],
         public readonly array $safetySettings = [],
         public readonly ?GenerationConfig $generationConfig = null,
     ) {
@@ -33,17 +36,17 @@ class GenerateContentRequest implements JsonSerializable, RequestInterface
         $this->ensureArrayOfType($this->safetySettings, SafetySetting::class);
     }
 
-    public function getOperation(): string
+    public function getOperation() : string
     {
         return "{$this->modelName->value}:generateContent";
     }
 
-    public function getHttpMethod(): string
+    public function getHttpMethod() : string
     {
         return 'POST';
     }
 
-    public function getHttpPayload(): string
+    public function getHttpPayload() : string
     {
         return (string) $this;
     }
@@ -52,18 +55,19 @@ class GenerateContentRequest implements JsonSerializable, RequestInterface
      * @return array{
      *     model: string,
      *     contents: Content[],
+     *     tools?: Tool[],
      *     safetySettings?: SafetySetting[],
      *     generationConfig?: GenerationConfig,
      * }
      */
-    public function jsonSerialize(): array
+    public function jsonSerialize() : array
     {
         $arr = [
             'model' => $this->modelName->value,
             'contents' => $this->contents,
         ];
 
-        if (!empty($this->safetySettings)) {
+        if (! empty($this->safetySettings)) {
             $arr['safetySettings'] = $this->safetySettings;
         }
 
@@ -71,10 +75,14 @@ class GenerateContentRequest implements JsonSerializable, RequestInterface
             $arr['generationConfig'] = $this->generationConfig;
         }
 
+        if ($this->tools) {
+            $arr['tools'] = $this->tools;
+        }
+
         return $arr;
     }
 
-    public function __toString(): string
+    public function __toString() : string
     {
         return json_encode($this) ?: '';
     }
