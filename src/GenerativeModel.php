@@ -15,6 +15,7 @@ use GeminiAPI\Responses\CountTokensResponse;
 use GeminiAPI\Responses\GenerateContentResponse;
 use GeminiAPI\Resources\Content;
 use GeminiAPI\Resources\Parts\PartInterface;
+use GeminiAPI\Resources\Tool;
 use GeminiAPI\Traits\ArrayTypeValidator;
 use Psr\Http\Client\ClientExceptionInterface;
 
@@ -27,6 +28,9 @@ class GenerativeModel
 
     private ?GenerationConfig $generationConfig = null;
 
+    /** @var Tool[] */
+    private array $tools = [];
+
     public function __construct(
         private readonly Client $client,
         public readonly ModelName $modelName,
@@ -36,7 +40,7 @@ class GenerativeModel
     /**
      * @throws ClientExceptionInterface
      */
-    public function generateContent(PartInterface ...$parts): GenerateContentResponse
+    public function generateContent(PartInterface ...$parts) : GenerateContentResponse
     {
         $content = new Content($parts, Role::User);
 
@@ -47,13 +51,14 @@ class GenerativeModel
      * @param Content[] $contents
      * @throws ClientExceptionInterface
      */
-    public function generateContentWithContents(array $contents): GenerateContentResponse
+    public function generateContentWithContents(array $contents) : GenerateContentResponse
     {
         $this->ensureArrayOfType($contents, Content::class);
 
         $request = new GenerateContentRequest(
             $this->modelName,
             $contents,
+            $this->tools,
             $this->safetySettings,
             $this->generationConfig,
         );
@@ -71,7 +76,7 @@ class GenerativeModel
         callable $callback,
         array $parts,
         ?CurlHandle $ch = null,
-    ): void {
+    ) : void {
         $this->ensureArrayOfType($parts, PartInterface::class);
 
         $content = new Content($parts, Role::User);
@@ -89,7 +94,7 @@ class GenerativeModel
         callable $callback,
         array $contents,
         ?CurlHandle $ch = null,
-    ): void {
+    ) : void {
         $this->ensureArrayOfType($contents, Content::class);
 
         $request = new GenerateContentStreamRequest(
@@ -102,7 +107,7 @@ class GenerativeModel
         $this->client->generateContentStream($request, $callback, $ch);
     }
 
-    public function startChat(): ChatSession
+    public function startChat() : ChatSession
     {
         return new ChatSession($this);
     }
@@ -110,7 +115,7 @@ class GenerativeModel
     /**
      * @throws ClientExceptionInterface
      */
-    public function countTokens(PartInterface ...$parts): CountTokensResponse
+    public function countTokens(PartInterface ...$parts) : CountTokensResponse
     {
         $content = new Content($parts, Role::User);
         $request = new CountTokensRequest(
@@ -121,7 +126,7 @@ class GenerativeModel
         return $this->client->countTokens($request);
     }
 
-    public function withAddedSafetySetting(SafetySetting $safetySetting): self
+    public function withAddedSafetySetting(SafetySetting $safetySetting) : self
     {
         $clone = clone $this;
         $clone->safetySettings[] = $safetySetting;
@@ -129,10 +134,18 @@ class GenerativeModel
         return $clone;
     }
 
-    public function withGenerationConfig(GenerationConfig $generationConfig): self
+    public function withGenerationConfig(GenerationConfig $generationConfig) : self
     {
         $clone = clone $this;
         $clone->generationConfig = $generationConfig;
+
+        return $clone;
+    }
+
+    public function withTool(Tool $tool) : self
+    {
+        $clone = clone $this;
+        $clone->tools[] = $tool;
 
         return $clone;
     }
