@@ -29,20 +29,20 @@ class GenerateContentResponse
     /**
      * @return PartInterface[]
      */
-    public function parts(): array
+    public function parts() : array
     {
         if (empty($this->candidates)) {
             throw new ValueError(
-                'The `GenerateContentResponse::parts()` quick accessor '.
-                'only works for a single candidate, but none were returned. '.
+                'The `GenerateContentResponse::parts()` quick accessor ' .
+                'only works for a single candidate, but none were returned. ' .
                 'Check the `GenerateContentResponse::$promptFeedback` to see if the prompt was blocked.'
             );
         }
 
         if (count($this->candidates) > 1) {
             throw new ValueError(
-                'The `GenerateContentResponse::parts()` quick accessor '.
-                'only works with a single candidate. '.
+                'The `GenerateContentResponse::parts()` quick accessor ' .
+                'only works with a single candidate. ' .
                 'With multiple candidates use GenerateContentResponse.candidates[index].text'
             );
         }
@@ -50,16 +50,21 @@ class GenerateContentResponse
         return $this->candidates[0]->content->parts;
     }
 
-    public function text(): string
+    public function tools() : array
+    {
+        return $this->candidates[0]->tools;
+    }
+
+    public function text() : string
     {
         $parts = $this->parts();
 
-        if (count($parts) > 1 || !$parts[0] instanceof TextPart) {
+        if (count($parts) > 1 || ! $parts[0] instanceof TextPart) {
             throw new ValueError(
-                'The `GenerateContentResponse::text()` quick accessor '.
-                'only works for simple (single-`Part`) text responses. '.
-                'This response contains multiple `Parts`. '.
-                'Use the `GenerateContentResponse::parts()` accessor '.
+                'The `GenerateContentResponse::text()` quick accessor ' .
+                'only works for simple (single-`Part`) text responses. ' .
+                'This response contains multiple `Parts`. ' .
+                'Use the `GenerateContentResponse::parts()` accessor ' .
                 'or the full `GenerateContentResponse.candidates[index].content.parts` lookup instead'
             );
         }
@@ -84,15 +89,15 @@ class GenerateContentResponse
      * } $array
      * @return self
      */
-    public static function fromArray(array $array): self
+    public static function fromArray(array $array) : self
     {
         $promptFeedback = null;
-        if (!empty($array['promptFeedback'])) {
+        if (! empty($array['promptFeedback'])) {
             $promptFeedback = PromptFeedback::fromArray($array['promptFeedback']);
         }
 
         $candidates = array_map(
-            static fn (array $candidate): Candidate => Candidate::fromArray($candidate),
+            static fn (array $candidate) : Candidate => Candidate::fromArray($candidate),
             $array['candidates'] ?? [],
         );
 

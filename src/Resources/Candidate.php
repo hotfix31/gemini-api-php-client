@@ -50,14 +50,14 @@ class Candidate
      * } $candidate
      * @return self
      */
-    public static function fromArray(array $candidate): self
+    public static function fromArray(array $candidate) : self
     {
         $citationMetadata = isset($candidate['citationMetadata'])
             ? CitationMetadata::fromArray($candidate['citationMetadata'])
             : new CitationMetadata();
 
         $safetyRatings = array_map(
-            static fn (array $rating): SafetyRating => SafetyRating::fromArray($rating),
+            static fn (array $rating) : SafetyRating => SafetyRating::fromArray($rating),
             $candidate['safetyRatings'] ?? [],
         );
 

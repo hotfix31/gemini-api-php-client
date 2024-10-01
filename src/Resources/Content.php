@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace GeminiAPI\Resources;
 
+use FunctionCall;
 use GeminiAPI\Enums\MimeType;
 use GeminiAPI\Enums\Role;
 use GeminiAPI\Traits\ArrayTypeValidator;
 use GeminiAPI\Resources\Parts\ImagePart;
 use GeminiAPI\Resources\Parts\PartInterface;
 use GeminiAPI\Resources\Parts\TextPart;
+use GeminiAPI\Resources\Parts\FunctionCallPart;
 
 class Content
 {
@@ -80,6 +82,18 @@ class Content
         );
     }
 
+    public static function functioncall(
+        string $name,
+        array $args,
+    ) : self {
+        return new self(
+            [
+                new FunctionCallPart($name, $args),
+            ],
+            Role::Model,
+        );
+    }
+
 
     /**
      * @param array{
@@ -94,6 +108,10 @@ class Content
         foreach ($content['parts'] as $part) {
             if (! empty($part['text'])) {
                 $parts[] = new TextPart($part['text']);
+            }
+
+            if (! empty($part['functionCall'])) {
+                $parts[] = new FunctionCallPart($part['name'], $part['args']);
             }
 
             if (! empty($part['inlineData'])) {
