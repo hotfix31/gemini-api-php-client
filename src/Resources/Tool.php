@@ -12,16 +12,16 @@ class Tool
     use ArrayTypeValidator;
 
     /**
-     * @param array[] $functionDeclarations
+     * @param array[] $function_declarations
      */
     public function __construct(
-        public array $functionDeclarations,
+        public array $function_declarations,
     ) {
     }
 
     public function addFunctionCall(string $name, $description, $parameters) : self
     {
-        $this->functionDeclarations[] = new FunctionCall($name, $description, $parameters);
+        $this->function_declarations[] = new FunctionCall($name, $description, $parameters);
 
         return $this;
     }
@@ -48,15 +48,15 @@ class Tool
      */
     public static function fromArray(array $tools) : self
     {
-        $functionDeclarations = [];
+        $function_declarations = [];
         foreach ($tools['function_declarations'] as $function) {
             if (! empty($part['name'])) {
-                $functionDeclarations[] = new FunctionCall($function['name'], $function['description'], $function['arguments']);
+                $function_declarations[] = new FunctionCall($function['name'], $function['description'], $function['arguments']);
             }
         }
 
         return new self(
-            $functionDeclarations,
+            $function_declarations,
         );
     }
 }

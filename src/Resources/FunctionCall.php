@@ -31,11 +31,9 @@ class FunctionCall implements JsonSerializable
     public function jsonSerialize() : array
     {
         return [
-            'function_declarations' => [
-                'name' => $this->name,
-                'description' => $this->description,
-                'arguments' => json_encode($this->arguments),
-            ],
+            'name' => $this->name,
+            'description' => $this->description,
+            'arguments' => json_encode($this->arguments),
         ];
     }
 
