@@ -250,7 +250,7 @@ class Client implements GeminiClientInterface
             throw new RuntimeException('Missing client or factory for Gemini API operation');
         }
 
-        $uri = "{$this->baseUrl}/v1/{$request->getOperation()}";
+        $uri = "{$this->baseUrl}/v1beta/{$request->getOperation()}";
         $httpRequest = $this->requestFactory
             ->createRequest($request->getHttpMethod(), $uri);
 
