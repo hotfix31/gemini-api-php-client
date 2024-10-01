@@ -57,7 +57,7 @@ class GenerateContentResponse
 
         if (count($parts) > 1 || ! $parts[0] instanceof FunctionCallPart) {
             throw new ValueError(
-                'The `GenerateContentResponse::text()` quick accessor ' .
+                'The `GenerateContentResponse::functionCall()` quick accessor ' .
                 'only works for simple (single-`Part`) text responses. ' .
                 'This response contains multiple `Parts`. ' .
                 'Use the `GenerateContentResponse::parts()` accessor ' .
