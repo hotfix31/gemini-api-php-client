@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace GeminiAPI\Resources;
+
 use JsonSerializable;
 
 class FunctionCall implements JsonSerializable
