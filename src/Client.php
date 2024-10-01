@@ -47,7 +47,7 @@ class Client implements GeminiClientInterface
     private array $requestHeaders = [];
 
     public function __construct(
-        private readonly string  $apiKey,
+        private readonly string $apiKey,
         private ?HttpClientInterface $client = null,
         private ?RequestFactoryInterface $requestFactory = null,
         private ?StreamFactoryInterface $streamFactory = null,
@@ -57,37 +57,37 @@ class Client implements GeminiClientInterface
         $this->streamFactory ??= Psr17FactoryDiscovery::findStreamFactory();
     }
 
-    public function geminiPro(): GenerativeModel
+    public function geminiPro() : GenerativeModel
     {
         return $this->generativeModel(ModelName::GeminiPro);
     }
 
-    public function geminiProVision(): GenerativeModel
+    public function geminiProVision() : GenerativeModel
     {
         return $this->generativeModel(ModelName::GeminiProVision);
     }
 
-    public function geminiPro10(): GenerativeModel
+    public function geminiPro10() : GenerativeModel
     {
         return $this->generativeModel(ModelName::GeminiPro10);
     }
-    public function geminiPro10Latest(): GenerativeModel
+    public function geminiPro10Latest() : GenerativeModel
     {
         return $this->generativeModel(ModelName::GeminiPro10Latest);
     }
 
-    public function geminiPro15(): GenerativeModel
+    public function geminiPro15() : GenerativeModel
     {
         return $this->generativeModel(ModelName::GeminiPro15);
     }
 
-    public function geminiProFlash1_5(): GenerativeModel
+    public function geminiProFlash1_5() : GenerativeModel
     {
         return $this->generativeModel(ModelName::GeminiPro15Flash);
     }
 
 
-    public function generativeModel(ModelName $modelName): GenerativeModel
+    public function generativeModel(ModelName $modelName) : GenerativeModel
     {
         return new GenerativeModel(
             $this,
@@ -95,7 +95,7 @@ class Client implements GeminiClientInterface
         );
     }
 
-    public function embeddingModel(ModelName $modelName): EmbeddingModel
+    public function embeddingModel(ModelName $modelName) : EmbeddingModel
     {
         return new EmbeddingModel(
             $this,
@@ -106,7 +106,7 @@ class Client implements GeminiClientInterface
     /**
      * @throws ClientExceptionInterface
      */
-    public function generateContent(GenerateContentRequest $request): GenerateContentResponse
+    public function generateContent(GenerateContentRequest $request) : GenerateContentResponse
     {
         $response = $this->doRequest($request);
         $json = json_decode($response, associative: true);
@@ -125,8 +125,8 @@ class Client implements GeminiClientInterface
         GenerateContentStreamRequest $request,
         callable $callback,
         ?CurlHandle $curl = null,
-    ): void {
-        if (!extension_loaded('curl')) {
+    ) : void {
+        if (! extension_loaded('curl')) {
             throw new BadMethodCallException('Gemini API requires `curl` extension for streaming responses');
         }
 
@@ -135,7 +135,7 @@ class Client implements GeminiClientInterface
             static fn (array $arr) => $callback(GenerateContentResponse::fromArray($arr)),
         );
 
-        $writeFunction = static function (CurlHandle $ch, string $str) use ($request, $parser): int {
+        $writeFunction = static function (CurlHandle $ch, string $str) use ($request, $parser) : int {
             $responseCode = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
 
             return $responseCode === 200
@@ -163,7 +163,7 @@ class Client implements GeminiClientInterface
             }
         }
 
-        curl_setopt($ch, CURLOPT_URL, "{$this->baseUrl}/v1/{$request->getOperation()}");
+        curl_setopt($ch, CURLOPT_URL, "{$this->baseUrl}/v1beta/{$request->getOperation()}");
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($request));
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headerLines);
@@ -175,7 +175,7 @@ class Client implements GeminiClientInterface
     /**
      * @throws ClientExceptionInterface
      */
-    public function embedContent(EmbedContentRequest $request): EmbedContentResponse
+    public function embedContent(EmbedContentRequest $request) : EmbedContentResponse
     {
         $response = $this->doRequest($request);
         $json = json_decode($response, associative: true);
@@ -186,7 +186,7 @@ class Client implements GeminiClientInterface
     /**
      * @throws ClientExceptionInterface
      */
-    public function countTokens(CountTokensRequest $request): CountTokensResponse
+    public function countTokens(CountTokensRequest $request) : CountTokensResponse
     {
         $response = $this->doRequest($request);
         $json = json_decode($response, associative: true);
@@ -197,7 +197,7 @@ class Client implements GeminiClientInterface
     /**
      * @throws ClientExceptionInterface
      */
-    public function listModels(): ListModelsResponse
+    public function listModels() : ListModelsResponse
     {
         $request = new ListModelsRequest();
         $response = $this->doRequest($request);
@@ -206,7 +206,7 @@ class Client implements GeminiClientInterface
         return ListModelsResponse::fromArray($json);
     }
 
-    public function withBaseUrl(string $baseUrl): self
+    public function withBaseUrl(string $baseUrl) : self
     {
         $clone = clone $this;
         $clone->baseUrl = $baseUrl;
@@ -218,7 +218,7 @@ class Client implements GeminiClientInterface
      * @param array<string, string|string[]> $headers
      * @return self
      */
-    public function withRequestHeaders(array $headers): self
+    public function withRequestHeaders(array $headers) : self
     {
         $clone = clone $this;
         $clone->requestHeaders = [];
@@ -233,7 +233,7 @@ class Client implements GeminiClientInterface
     /**
      * @return array<string, string|string[]>
      */
-    private function getRequestHeaders(): array
+    private function getRequestHeaders() : array
     {
         return $this->requestHeaders + [
             'content-type' => 'application/json',
@@ -244,9 +244,9 @@ class Client implements GeminiClientInterface
     /**
      * @throws ClientExceptionInterface
      */
-    private function doRequest(RequestInterface $request): string
+    private function doRequest(RequestInterface $request) : string
     {
-        if (!isset($this->client, $this->requestFactory, $this->streamFactory)) {
+        if (! isset($this->client, $this->requestFactory, $this->streamFactory)) {
             throw new RuntimeException('Missing client or factory for Gemini API operation');
         }
 
@@ -259,7 +259,7 @@ class Client implements GeminiClientInterface
         }
 
         $payload = $request->getHttpPayload();
-        if (!empty($payload)) {
+        if (! empty($payload)) {
             $stream = $this->streamFactory->createStream($payload);
             $httpRequest = $httpRequest->withBody($stream);
         }
