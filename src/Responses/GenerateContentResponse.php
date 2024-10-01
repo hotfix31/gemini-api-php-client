@@ -51,7 +51,7 @@ class GenerateContentResponse
         return $this->candidates[0]->content->parts;
     }
 
-    public function functionCalls() : array
+    public function functionCall() : array
     {
         $parts = $this->parts();
 
@@ -65,7 +65,7 @@ class GenerateContentResponse
             );
         }
 
-        return $parts[0]->functionCalls;
+        return $parts[0]->functionCall;
     }
 
     public function text() : string

@@ -82,13 +82,13 @@ class Content
         );
     }
 
-    public static function functioncall(
+    public static function functionCall(
         string $name,
         array $args,
     ) : self {
         return new self(
             [
-                new FunctionCallPart($name, $args),
+                new FunctionCallPart([$name, $args]),
             ],
             Role::Model,
         );

@@ -11,18 +11,18 @@ use function json_encode;
 class FunctionCallPart implements PartInterface, JsonSerializable
 {
     public function __construct(
-        public readonly array $functionCalls,
+        public readonly array $functionCall,
     ) {
     }
 
     /**
      * @return array{
-     *     functionCalls: array,
+     *     functionCall: array,
      * }
      */
     public function jsonSerialize() : array
     {
-        return ['name' => $this->functionCalls['name'], 'args' => $this->functionCalls['args']];
+        return ['name' => $this->functionCall['name'], 'args' => $this->functionCall['args']];
     }
 
     public function __toString() : string
