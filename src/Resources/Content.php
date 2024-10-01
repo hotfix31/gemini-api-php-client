@@ -111,7 +111,7 @@ class Content
             }
 
             if (! empty($part['functionCall'])) {
-                $parts[] = new FunctionCallPart($part['name'], $part['args']);
+                $parts[] = new FunctionCallPart([$part['functionCall']['name'], $part['functionCall']['args']]);
             }
 
             if (! empty($part['inlineData'])) {

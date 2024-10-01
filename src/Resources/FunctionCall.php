@@ -11,7 +11,7 @@ class FunctionCall implements JsonSerializable
     public function __construct(
         public readonly string $name,
         public readonly string $description,
-        public readonly array $arguments = [],
+        public readonly array $parameters = [],
     ) {
     }
 
@@ -19,13 +19,13 @@ class FunctionCall implements JsonSerializable
      * @param array{
      *     name: string,
      *     description: string,
-     *     arguments: array,
+     *     parameters: array,
      * } $array
      * @return self
      */
     public static function fromArray(array $array) : self
     {
-        return new self($array['name'], $array['description'], $array['arguments']);
+        return new self($array['name'], $array['description'], $array['parameters']);
     }
 
     public function jsonSerialize() : array
@@ -33,12 +33,7 @@ class FunctionCall implements JsonSerializable
         return [
             'name' => $this->name,
             'description' => $this->description,
-            'arguments' => json_encode($this->arguments),
+            'parameters' => $this->parameters,
         ];
-    }
-
-    public function __toString() : string
-    {
-        return json_encode($this) ?: '';
     }
 }
