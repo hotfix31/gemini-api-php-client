@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace GeminiAPI\Resources;
 
-use FunctionCall;
+use GeminiAPI\Resources\FunctionCall;
 use GeminiAPI\Traits\ArrayTypeValidator;
 
 class Tool

@@ -6,6 +6,7 @@ namespace GeminiAPI\Responses;
 
 use GeminiAPI\Traits\ArrayTypeValidator;
 use GeminiAPI\Resources\Candidate;
+use GeminiAPI\Resources\Parts\FunctionCallPart;
 use GeminiAPI\Resources\Parts\PartInterface;
 use GeminiAPI\Resources\Parts\TextPart;
 use GeminiAPI\Resources\PromptFeedback;
@@ -50,9 +51,21 @@ class GenerateContentResponse
         return $this->candidates[0]->content->parts;
     }
 
-    public function tools() : array
+    public function functionCalls() : array
     {
-        return $this->candidates[0]->tools;
+        $parts = $this->parts();
+
+        if (count($parts) > 1 || ! $parts[0] instanceof FunctionCallPart) {
+            throw new ValueError(
+                'The `GenerateContentResponse::text()` quick accessor ' .
+                'only works for simple (single-`Part`) text responses. ' .
+                'This response contains multiple `Parts`. ' .
+                'Use the `GenerateContentResponse::parts()` accessor ' .
+                'or the full `GenerateContentResponse.candidates[index].content.parts` lookup instead'
+            );
+        }
+
+        return $parts[0]->functionCalls;
     }
 
     public function text() : string
