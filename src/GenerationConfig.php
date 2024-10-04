@@ -19,11 +19,13 @@ class GenerationConfig implements JsonSerializable
      *     temperature?: float,
      *     topP?: float,
      *     topK?: int,
+     *     responseMimeType?: string,
+     *     response_schema?: array[],
      * }
      */
     private array $config;
 
-    public function withCandidateCount(int $candidateCount): self
+    public function withCandidateCount(int $candidateCount) : self
     {
         if ($candidateCount < 0) {
             throw new UnexpectedValueException('Candidate count is negative');
@@ -39,7 +41,7 @@ class GenerationConfig implements JsonSerializable
      * @param string[] $stopSequences
      * @return $this
      */
-    public function withStopSequences(array $stopSequences): self
+    public function withStopSequences(array $stopSequences) : self
     {
         $this->ensureArrayOfString($stopSequences);
 
@@ -49,7 +51,7 @@ class GenerationConfig implements JsonSerializable
         return $clone;
     }
 
-    public function withMaxOutputTokens(int $maxOutputTokens): self
+    public function withMaxOutputTokens(int $maxOutputTokens) : self
     {
         if ($maxOutputTokens < 0) {
             throw new UnexpectedValueException('Max output tokens is negative');
@@ -61,7 +63,7 @@ class GenerationConfig implements JsonSerializable
         return $clone;
     }
 
-    public function withTemperature(float $temperature): self
+    public function withTemperature(float $temperature) : self
     {
         if ($temperature < 0.0 || $temperature > 1.0) {
             throw new UnexpectedValueException('Temperature is negative or more than 1');
@@ -73,7 +75,7 @@ class GenerationConfig implements JsonSerializable
         return $clone;
     }
 
-    public function withTopP(float $topP): self
+    public function withTopP(float $topP) : self
     {
         if ($topP < 0.0) {
             throw new UnexpectedValueException('Top-p is negative');
@@ -85,7 +87,7 @@ class GenerationConfig implements JsonSerializable
         return $clone;
     }
 
-    public function withTopK(int $topK): self
+    public function withTopK(int $topK) : self
     {
         if ($topK < 0) {
             throw new UnexpectedValueException('Top-k is negative');
@@ -93,6 +95,22 @@ class GenerationConfig implements JsonSerializable
 
         $clone = clone $this;
         $clone->config['topK'] = $topK;
+
+        return $clone;
+    }
+
+    public function withResponseMimeType(string $responseMimeType) : self
+    {
+        $clone = clone $this;
+        $clone->config['responseMimeType'] = $responseMimeType;
+
+        return $clone;
+    }
+
+    public function withResponseSchema(array $responseSchema) : self
+    {
+        $clone = clone $this;
+        $clone->config['response_schema'] = $responseSchema;
 
         return $clone;
     }
@@ -105,9 +123,11 @@ class GenerationConfig implements JsonSerializable
      *      temperature?: float,
      *      topP?: float,
      *      topK?: int,
+     *      responseMimeType?: string,
+     *      response_schema?: array[],
      *  }
      */
-    public function jsonSerialize(): array
+    public function jsonSerialize() : array
     {
         return $this->config;
     }
