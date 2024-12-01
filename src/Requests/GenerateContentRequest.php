@@ -24,6 +24,7 @@ class GenerateContentRequest implements JsonSerializable, RequestInterface
      * @param Tool[] $tools
      * @param SafetySetting[] $safetySettings
      * @param GenerationConfig|null $generationConfig
+     * @param ?Content $systemInstruction
      */
     public function __construct(
         public readonly ModelName $modelName,
@@ -31,6 +32,7 @@ class GenerateContentRequest implements JsonSerializable, RequestInterface
         public readonly array $tools = [],
         public readonly array $safetySettings = [],
         public readonly ?GenerationConfig $generationConfig = null,
+        public readonly ?Content $systemInstruction = null,
     ) {
         $this->ensureArrayOfType($this->contents, Content::class);
         $this->ensureArrayOfType($this->safetySettings, SafetySetting::class);
@@ -58,6 +60,7 @@ class GenerateContentRequest implements JsonSerializable, RequestInterface
      *     tools?: Tool[],
      *     safetySettings?: SafetySetting[],
      *     generationConfig?: GenerationConfig,
+     *     systemInstruction?: Content,
      * }
      */
     public function jsonSerialize() : array
@@ -77,6 +80,10 @@ class GenerateContentRequest implements JsonSerializable, RequestInterface
 
         if ($this->tools) {
             $arr['tools'] = $this->tools;
+        }
+
+        if ($this->systemInstruction) {
+            $arr['systemInstruction'] = $this->systemInstruction;
         }
 
         return $arr;

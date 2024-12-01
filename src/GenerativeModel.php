@@ -31,6 +31,8 @@ class GenerativeModel
     /** @var Tool[] */
     private array $tools = [];
 
+    private ?Content $systemInstruction = null;
+
     public function __construct(
         private readonly Client $client,
         public readonly ModelName $modelName,
@@ -61,6 +63,7 @@ class GenerativeModel
             $this->tools,
             $this->safetySettings,
             $this->generationConfig,
+            $this->systemInstruction,
         );
 
         return $this->client->generateContent($request);
@@ -102,6 +105,7 @@ class GenerativeModel
             $contents,
             $this->safetySettings,
             $this->generationConfig,
+            $this->systemInstruction,
         );
 
         $this->client->generateContentStream($request, $callback, $ch);
@@ -146,6 +150,14 @@ class GenerativeModel
     {
         $clone = clone $this;
         $clone->tools[] = $tool;
+
+        return $clone;
+    }
+
+    public function withSystemInstruction(string $systemInstruction): self
+    {
+        $clone = clone $this;
+        $clone->systemInstruction = Content::text($systemInstruction, Role::User);
 
         return $clone;
     }
