@@ -7,6 +7,7 @@ namespace GeminiAPI\Resources;
 use FunctionCall;
 use GeminiAPI\Enums\MimeType;
 use GeminiAPI\Enums\Role;
+use GeminiAPI\Resources\Parts\FilePart;
 use GeminiAPI\Traits\ArrayTypeValidator;
 use GeminiAPI\Resources\Parts\ImagePart;
 use GeminiAPI\Resources\Parts\PartInterface;
@@ -42,6 +43,13 @@ class Content
         return $this;
     }
 
+    public function addFile(MimeType $mimeType, string $file): self
+    {
+        $this->parts[] = new FilePart($mimeType, $file);
+
+        return $this;
+    }
+
     public static function text(
         string $text,
         Role $role = Role::User,
@@ -62,6 +70,19 @@ class Content
         return new self(
             [
                 new ImagePart($mimeType, $image),
+            ],
+            $role,
+        );
+    }
+
+    public static function file(
+        MimeType $mimeType,
+        string $file,
+        Role $role = Role::User
+    ): self {
+        return new self(
+            [
+                new FilePart($mimeType, $file),
             ],
             $role,
         );
@@ -95,6 +116,21 @@ class Content
     }
 
 
+    public static function textAndFile(
+        string $text,
+        MimeType $mimeType,
+        string $file,
+        Role $role = Role::User,
+    ): self {
+        return new self(
+            [
+                new TextPart($text),
+                new FilePart($mimeType, $file),
+            ],
+            $role,
+        );
+    }
+
     /**
      * @param array{
      *     parts: array<int, array{text?: string, inlineData?: array{mimeType: string, data: string}}>,
@@ -116,7 +152,7 @@ class Content
 
             if (! empty($part['inlineData'])) {
                 $mimeType = MimeType::from($part['inlineData']['mimeType']);
-                $parts[] = new ImagePart($mimeType, $part['inlineData']['data']);
+                $parts[] = new FilePart($mimeType, $part['inlineData']['data']);
             }
         }
 
