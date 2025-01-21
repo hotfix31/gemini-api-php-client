@@ -55,6 +55,10 @@ class Tool
             }
         }
 
+        if(isset($tools['google_search_retrieval'])) {
+            $function_declarations[] = new GoogleSearch($tools['google_search_retrieval']);
+        }
+
         return new self(
             $function_declarations,
         );

@@ -61,29 +61,19 @@ class Client implements GeminiClientInterface
     {
         return $this->generativeModel(ModelName::GeminiPro);
     }
-
-    public function geminiProVision() : GenerativeModel
+    public function geminiProExp() : GenerativeModel
     {
-        return $this->generativeModel(ModelName::GeminiProVision);
+        return $this->generativeModel(ModelName::GeminiProExp);
     }
 
-    public function geminiPro10() : GenerativeModel
+    public function geminiFlash() : GenerativeModel
     {
-        return $this->generativeModel(ModelName::GeminiPro10);
-    }
-    public function geminiPro10Latest() : GenerativeModel
-    {
-        return $this->generativeModel(ModelName::GeminiPro10Latest);
+        return $this->generativeModel(ModelName::GeminiFlash);
     }
 
-    public function geminiPro15() : GenerativeModel
+    public function geminiFlashExp() : GenerativeModel
     {
-        return $this->generativeModel(ModelName::GeminiPro15);
-    }
-
-    public function geminiProFlash1_5() : GenerativeModel
-    {
-        return $this->generativeModel(ModelName::GeminiPro15Flash);
+        return $this->generativeModel(ModelName::GeminiFlashExp);
     }
 
 
