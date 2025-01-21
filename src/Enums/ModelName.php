@@ -8,7 +8,7 @@ enum ModelName: string
 {
     case Default = 'models/text-bison-001';
     case GeminiPro = 'models/gemini-1.5-pro';
-    case GeminiProExp = 'models/emini-exp-1206';
+    case GeminiProExp = 'models/gemini-exp-1206';
     case GeminiFlash = 'models/gemini-1.5-flash';
     case GeminiFlashExp = 'models/gemini-2.0-flash-exp';
     case GeminiProVision = 'models/gemini-pro-vision';
