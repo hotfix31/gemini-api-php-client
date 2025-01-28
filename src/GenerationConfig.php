@@ -102,7 +102,7 @@ class GenerationConfig implements JsonSerializable
     public function withResponseMimeType(string $responseMimeType) : self
     {
         $clone = clone $this;
-        $clone->config['response_mime_type'] = $responseMimeType;
+        $clone->config['responseMimeType'] = $responseMimeType;
 
         return $clone;
     }
@@ -110,7 +110,7 @@ class GenerationConfig implements JsonSerializable
     public function withResponseSchema(array $responseSchema) : self
     {
         $clone = clone $this;
-        $clone->config['response_schema'] = $responseSchema;
+        $clone->config['responseSchema'] = $responseSchema;
 
         return $clone;
     }
