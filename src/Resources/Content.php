@@ -13,6 +13,7 @@ use GeminiAPI\Resources\Parts\ImagePart;
 use GeminiAPI\Resources\Parts\PartInterface;
 use GeminiAPI\Resources\Parts\TextPart;
 use GeminiAPI\Resources\Parts\FunctionCallPart;
+use GeminiAPI\Resources\Parts\FunctionResponsePart;
 
 class Content
 {
@@ -115,6 +116,18 @@ class Content
         );
     }
 
+    public static function functionResponse(
+        string $name,
+        array $args,
+    ) : self {
+        return new self(
+            [
+                new FunctionResponsePart(['name' => $name, 'response' => $args]),
+            ],
+            Role::Model,
+        );
+    }
+
 
     public static function textAndFile(
         string $text,
@@ -148,6 +161,10 @@ class Content
 
             if (! empty($part['functionCall'])) {
                 $parts[] = new FunctionCallPart([$part['functionCall']['name'], $part['functionCall']['args']]);
+            }
+
+            if (! empty($part['functionResponse'])) {
+                $parts[] = new FunctionResponsePart([$part['functionResponse']['name'], $part['functionResponse']['args']]);
             }
 
             if (! empty($part['inlineData'])) {
