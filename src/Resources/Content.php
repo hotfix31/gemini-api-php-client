@@ -109,7 +109,7 @@ class Content
     ) : self {
         return new self(
             [
-                new FunctionCallPart([$name, $args]),
+                new FunctionCallPart(['name' => $name, 'args' => $args]),
             ],
             Role::Model,
         );
