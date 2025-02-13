@@ -22,7 +22,16 @@ class FunctionResponsePart implements PartInterface, JsonSerializable
      */
     public function jsonSerialize() : array
     {
-        return ['functionResponse' => ['name' => $this->functionResponse['name'], 'response' => $this->functionResponse['response']]];
+        return [
+            'functionResponse' => 
+            [
+                'name' => $this->functionResponse['name'],
+                'response' => [
+                    'name' => $this->functionResponse['name'],
+                    'content' => $this->functionResponse['response'],
+                ],
+            ]
+        ];
     }
 
     public function __toString() : string
