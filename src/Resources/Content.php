@@ -164,7 +164,7 @@ class Content
             }
 
             if (! empty($part['functionResponse'])) {
-                $parts[] = new FunctionResponsePart([$part['functionResponse']['name'], $part['functionResponse']['args']]);
+                $parts[] = new FunctionResponsePart([$part['functionResponse']['name'], $part['functionResponse']['response']]);
             }
 
             if (! empty($part['inlineData'])) {
