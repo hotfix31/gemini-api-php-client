@@ -22,7 +22,7 @@ class FunctionCallPart implements PartInterface, JsonSerializable
      */
     public function jsonSerialize() : array
     {
-        return ['functionCall' => ['name' => $this->functionCall['name'], 'args' => $this->functionCall['args']]];
+        return ['functionCall' => ['name' => $this->functionCall[0], 'args' => $this->functionCall[1]]];
     }
 
     public function __toString() : string
