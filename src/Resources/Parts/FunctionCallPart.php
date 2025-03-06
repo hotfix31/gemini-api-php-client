@@ -8,24 +8,26 @@ use JsonSerializable;
 
 use function json_encode;
 
-class FunctionCallPart implements PartInterface, JsonSerializable
+class FunctionCallPart implements JsonSerializable, PartInterface
 {
     public function __construct(
         public readonly array $functionCall,
-    ) {
-    }
+    ) {}
 
     /**
      * @return array{
      *     functionCall: array,
      * }
      */
-    public function jsonSerialize() : array
+    public function jsonSerialize(): array
     {
-        return ['functionCall' => ['name' => $this->functionCall[0], 'args' => $this->functionCall[1]]];
+
+        return [
+            'functionCall' => ['name' => $this->functionCall['name'], 'args' => $this->functionCall['args']],
+        ];
     }
 
-    public function __toString() : string
+    public function __toString(): string
     {
         return json_encode($this) ?: '';
     }

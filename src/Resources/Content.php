@@ -160,11 +160,11 @@ class Content
             }
 
             if (! empty($part['functionCall'])) {
-                $parts[] = new FunctionCallPart([$part['functionCall']['name'], $part['functionCall']['args']]);
+                $parts[] = new FunctionCallPart(['name' => $part['functionCall']['name'], 'args' => $part['functionCall']['args']]);
             }
 
             if (! empty($part['functionResponse'])) {
-                $parts[] = new FunctionResponsePart([$part['functionResponse']['name'], $part['functionResponse']['response']]);
+                $parts[] = new FunctionResponsePart(['name' => $part['functionResponse']['name'], 'response' => $part['functionResponse']['response']]);
             }
 
             if (! empty($part['inlineData'])) {
