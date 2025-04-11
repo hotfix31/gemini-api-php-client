@@ -8,6 +8,13 @@
             <directory>./src</directory>
         </include>
     </source>
+    <coverage>
+        <report>
+            <html outputDirectory="coverage"/>
+            <text showUncoveredFiles="true" showOnlySummary="true"/>
+        </report>
+        <branches>true</branches>
+    </coverage>
     <testsuites>
         <testsuite name="unit">
             <directory suffix=".php">./tests/Unit</directory>

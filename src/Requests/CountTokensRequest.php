@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace GeminiAPI\Requests;
 
-use GeminiAPI\Enums\ModelName;
 use GeminiAPI\Resources\Content;
 use GeminiAPI\Traits\ArrayTypeValidator;
 use GeminiAPI\Traits\ModelNameToString;
@@ -18,12 +17,15 @@ class CountTokensRequest implements JsonSerializable, RequestInterface
     use ModelNameToString;
 
     /**
-     * @param ModelName|string $modelName
      * @param Content[] $contents
      */
     public function __construct(
-        public readonly ModelName|string $modelName,
+        public readonly string $modelName,
         public readonly array $contents,
+        public readonly array $safetySettings = [],
+        public readonly ?GenerationConfig $generationConfig = null,
+        public readonly ?Content $systemInstruction = null,
+        public readonly array $tools = [],
     ) {
         $this->ensureArrayOfType($this->contents, Content::class);
     }
@@ -51,10 +53,28 @@ class CountTokensRequest implements JsonSerializable, RequestInterface
      */
     public function jsonSerialize(): array
     {
-        return [
+        $arr = [
             'model' => $this->modelNameToString($this->modelName),
             'contents' => $this->contents,
         ];
+
+        if (!empty($this->safetySettings)) {
+            $arr['safetySettings'] = $this->safetySettings;
+        }
+
+        if ($this->generationConfig) {
+            $arr['generationConfig'] = $this->generationConfig;
+        }
+
+        if ($this->systemInstruction) {
+            $arr['systemInstruction'] = $this->systemInstruction;
+        }
+
+        if (!empty($this->tools)) {
+            $arr['tools'] = $this->tools;
+        }
+
+        return $arr;
     }
 
     public function __toString(): string

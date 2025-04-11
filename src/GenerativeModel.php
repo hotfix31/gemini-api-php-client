@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace GeminiAPI;
 
 use CurlHandle;
-use GeminiAPI\Enums\ModelName;
 use GeminiAPI\Enums\Role;
 use GeminiAPI\Requests\CountTokensRequest;
 use GeminiAPI\Requests\GenerateContentRequest;
@@ -14,6 +13,7 @@ use GeminiAPI\Responses\CountTokensResponse;
 use GeminiAPI\Responses\GenerateContentResponse;
 use GeminiAPI\Resources\Content;
 use GeminiAPI\Resources\Parts\PartInterface;
+use GeminiAPI\Resources\Tool;
 use GeminiAPI\Traits\ArrayTypeValidator;
 use Psr\Http\Client\ClientExceptionInterface;
 
@@ -28,9 +28,12 @@ class GenerativeModel
 
     private ?Content $systemInstruction = null;
 
+    /** @var Tool[] */
+    private array $tools = [];
+
     public function __construct(
         private readonly Client $client,
-        public readonly ModelName|string $modelName,
+        public readonly string $modelName,
     ) {
     }
 
@@ -58,6 +61,7 @@ class GenerativeModel
             $this->safetySettings,
             $this->generationConfig,
             $this->systemInstruction,
+            $this->tools,
         );
 
         return $this->client->generateContent($request);
@@ -100,6 +104,7 @@ class GenerativeModel
             $this->safetySettings,
             $this->generationConfig,
             $this->systemInstruction,
+            $this->tools,
         );
 
         $this->client->generateContentStream($request, $callback, $ch);
@@ -140,6 +145,11 @@ class GenerativeModel
         return $clone;
     }
 
+    public function getGenerationConfig(): GenerationConfig
+    {
+        return $this->generationConfig;
+    }
+
     public function withSystemInstruction(string $systemInstruction): self
     {
         $clone = clone $this;
@@ -147,4 +157,13 @@ class GenerativeModel
 
         return $clone;
     }
+
+    public function withTool(Tool $tool): self
+    {
+        $clone = clone $this;
+        $clone->tools[] = $tool;
+
+        return $clone;
+    }
+
 }

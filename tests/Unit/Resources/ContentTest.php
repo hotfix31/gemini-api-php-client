@@ -10,106 +10,123 @@ use GeminiAPI\Resources\Content;
 use GeminiAPI\Resources\Parts\FilePart;
 use GeminiAPI\Resources\Parts\ImagePart;
 use GeminiAPI\Resources\Parts\TextPart;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @coversClass \GeminiAPI\Resources\Content
+ */
 class ContentTest extends TestCase
 {
-    public function testConstructorWithNoContents()
+    public function testConstructor(): void
+    {
+        $parts = [new TextPart('test')];
+        $content = new Content($parts, Role::User);
+
+        $this->assertSame($parts, $content->parts);
+        $this->assertSame(Role::User, $content->role);
+    }
+
+    public function testConstructorThrowsExceptionForInvalidParts(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        new Content(['invalid'], Role::User);
+    }
+
+    public function testAddText(): void
     {
         $content = new Content([], Role::User);
-        self::assertInstanceOf(Content::class, $content);
-        self::assertEmpty($content->parts);
-        self::assertEquals(Role::User, $content->role);
+        $content = $content->addText('test');
+
+        $this->assertCount(1, $content->parts);
+        $this->assertInstanceOf(TextPart::class, $content->parts[0]);
+        $this->assertSame('test', $content->parts[0]->text);
     }
 
-    public function testConstructorWithContents()
-    {
-        $content = new Content(
-            [new TextPart('this is a text')],
-            Role::User,
-        );
-        self::assertInstanceOf(Content::class, $content);
-        self::assertEquals([new TextPart('this is a text')], $content->parts);
-        self::assertEquals(Role::User, $content->role);
-    }
-
-    public function testText()
-    {
-        $content = Content::text('this is a text', Role::Model);
-        self::assertInstanceOf(Content::class, $content);
-        self::assertEquals([new TextPart('this is a text')], $content->parts);
-        self::assertEquals(Role::Model, $content->role);
-    }
-
-    public function testImage()
-    {
-        $content = Content::image(
-            MimeType::IMAGE_JPEG,
-            'this is an image',
-            Role::Model,
-        );
-        self::assertInstanceOf(Content::class, $content);
-        self::assertEquals([new ImagePart(MimeType::IMAGE_JPEG, 'this is an image')], $content->parts);
-        self::assertEquals(Role::Model, $content->role);
-    }
-
-    public function testTextAndImage()
-    {
-        $content = Content::textAndImage(
-            'this is a text',
-            MimeType::IMAGE_JPEG,
-            'this is an image',
-            Role::Model,
-        );
-        $parts = [
-            new TextPart('this is a text'),
-            new ImagePart(MimeType::IMAGE_JPEG, 'this is an image'),
-        ];
-        self::assertInstanceOf(Content::class, $content);
-        self::assertEquals($parts, $content->parts);
-        self::assertEquals(Role::Model, $content->role);
-    }
-
-    public function testAddText()
+    public function testAddImage(): void
     {
         $content = new Content([], Role::User);
-        $content->addText('this is a text');
-        self::assertEquals([new TextPart('this is a text')], $content->parts);
+        $content = $content->addImage(MimeType::IMAGE_JPEG, 'base64image');
+
+        $this->assertCount(1, $content->parts);
+        $this->assertInstanceOf(ImagePart::class, $content->parts[0]);
+        $this->assertSame(MimeType::IMAGE_JPEG, $content->parts[0]->mimeType);
+        $this->assertSame('base64image', $content->parts[0]->data);
     }
 
-    public function testAddImage()
+    public function testAddFile(): void
     {
         $content = new Content([], Role::User);
-        $content->addImage(MimeType::IMAGE_JPEG, 'this is an image');
-        self::assertEquals([new ImagePart(MimeType::IMAGE_JPEG, 'this is an image')], $content->parts);
+        $content = $content->addFile(MimeType::FILE_PDF, 'base64file');
+
+        $this->assertCount(1, $content->parts);
+        $this->assertInstanceOf(FilePart::class, $content->parts[0]);
+        $this->assertSame(MimeType::FILE_PDF, $content->parts[0]->mimeType);
+        $this->assertSame('base64file', $content->parts[0]->data);
     }
 
-    public function testFromArrayWithNoParts()
+    public function testText(): void
     {
-        $content = Content::fromArray([
-            'parts' => [],
-            'role' => 'user',
-        ]);
-        self::assertInstanceOf(Content::class, $content);
-        self::assertEmpty($content->parts);
-        self::assertEquals(Role::User, $content->role);
+        $content = Content::text('test');
+
+        $this->assertCount(1, $content->parts);
+        $this->assertInstanceOf(TextPart::class, $content->parts[0]);
+        $this->assertSame('test', $content->parts[0]->text);
+        $this->assertSame(Role::User, $content->role);
     }
 
-    public function testFromArrayWithParts()
+    public function testTextWithCustomRole(): void
     {
-        $content = Content::fromArray([
-            'parts' => [
-                ['text' => 'this is a text'],
-                ['inlineData' => ['mimeType' => 'image/jpeg', 'data' => 'this is an image']],
-            ],
-            'role' => 'user',
-        ]);
-        $parts = [
-            new TextPart('this is a text'),
-            new FilePart(MimeType::IMAGE_JPEG, 'this is an image'),
-        ];
-        self::assertInstanceOf(Content::class, $content);
-        self::assertEquals($parts, $content->parts);
-        self::assertEquals(Role::User, $content->role);
+        $content = Content::text('test', Role::Model);
+
+        $this->assertCount(1, $content->parts);
+        $this->assertInstanceOf(TextPart::class, $content->parts[0]);
+        $this->assertSame('test', $content->parts[0]->text);
+        $this->assertSame(Role::Model, $content->role);
+    }
+
+    public function testImage(): void
+    {
+        $content = Content::image(MimeType::IMAGE_JPEG, 'base64image');
+
+        $this->assertCount(1, $content->parts);
+        $this->assertInstanceOf(ImagePart::class, $content->parts[0]);
+        $this->assertSame(MimeType::IMAGE_JPEG, $content->parts[0]->mimeType);
+        $this->assertSame('base64image', $content->parts[0]->data);
+        $this->assertSame(Role::User, $content->role);
+    }
+
+    public function testImageWithCustomRole(): void
+    {
+        $content = Content::image(MimeType::IMAGE_JPEG, 'base64image', Role::Model);
+
+        $this->assertCount(1, $content->parts);
+        $this->assertInstanceOf(ImagePart::class, $content->parts[0]);
+        $this->assertSame(MimeType::IMAGE_JPEG, $content->parts[0]->mimeType);
+        $this->assertSame('base64image', $content->parts[0]->data);
+        $this->assertSame(Role::Model, $content->role);
+    }
+
+    public function testFile(): void
+    {
+        $content = Content::file(MimeType::FILE_PDF, 'base64file');
+
+        $this->assertCount(1, $content->parts);
+        $this->assertInstanceOf(FilePart::class, $content->parts[0]);
+        $this->assertSame(MimeType::FILE_PDF, $content->parts[0]->mimeType);
+        $this->assertSame('base64file', $content->parts[0]->data);
+        $this->assertSame(Role::User, $content->role);
+    }
+
+    public function testFileWithCustomRole(): void
+    {
+        $content = Content::file(MimeType::FILE_PDF, 'base64file', Role::Model);
+
+        $this->assertCount(1, $content->parts);
+        $this->assertInstanceOf(FilePart::class, $content->parts[0]);
+        $this->assertSame(MimeType::FILE_PDF, $content->parts[0]->mimeType);
+        $this->assertSame('base64file', $content->parts[0]->data);
+        $this->assertSame(Role::Model, $content->role);
     }
 }

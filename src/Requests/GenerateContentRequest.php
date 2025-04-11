@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace GeminiAPI\Requests;
 
-use GeminiAPI\Enums\ModelName;
 use GeminiAPI\GenerationConfig;
 use GeminiAPI\Resources\Content;
+use GeminiAPI\Resources\Tool;
 use GeminiAPI\SafetySetting;
 use GeminiAPI\Traits\ArrayTypeValidator;
 use GeminiAPI\Traits\ModelNameToString;
@@ -20,18 +20,18 @@ class GenerateContentRequest implements JsonSerializable, RequestInterface
     use ModelNameToString;
 
     /**
-     * @param ModelName|string $modelName
      * @param Content[] $contents
      * @param SafetySetting[] $safetySettings
      * @param GenerationConfig|null $generationConfig
      * @param ?Content $systemInstruction
      */
     public function __construct(
-        public readonly ModelName|string $modelName,
+        public readonly string $modelName,
         public readonly array $contents,
         public readonly array $safetySettings = [],
         public readonly ?GenerationConfig $generationConfig = null,
         public readonly ?Content $systemInstruction = null,
+        public readonly array $tools = [],
     ) {
         $this->ensureArrayOfType($this->contents, Content::class);
         $this->ensureArrayOfType($this->safetySettings, SafetySetting::class);
@@ -59,6 +59,7 @@ class GenerateContentRequest implements JsonSerializable, RequestInterface
      *     safetySettings?: SafetySetting[],
      *     generationConfig?: GenerationConfig,
      *     systemInstruction?: Content,
+     *     tools?: Tool[],
      * }
      */
     public function jsonSerialize(): array
@@ -78,6 +79,10 @@ class GenerateContentRequest implements JsonSerializable, RequestInterface
 
         if ($this->systemInstruction) {
             $arr['systemInstruction'] = $this->systemInstruction;
+        }
+
+        if (!empty($this->tools)) {
+            $arr['tools'] = $this->tools;
         }
 
         return $arr;

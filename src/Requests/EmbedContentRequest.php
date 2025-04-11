@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace GeminiAPI\Requests;
 
 use BadMethodCallException;
-use GeminiAPI\Enums\ModelName;
 use GeminiAPI\Enums\TaskType;
 use GeminiAPI\Resources\Content;
 use GeminiAPI\Traits\ModelNameToString;
@@ -18,7 +17,7 @@ class EmbedContentRequest implements JsonSerializable, RequestInterface
     use ModelNameToString;
 
     public function __construct(
-        public readonly ModelName|string $modelName,
+        public readonly string $modelName,
         public readonly Content $content,
         public readonly ?TaskType $taskType = null,
         public readonly ?string $title = null,

@@ -30,9 +30,11 @@ class ChatSession
     public function sendMessage(PartInterface ...$parts): GenerateContentResponse
     {
         $this->history[] = new Content($parts, Role::User);
-
-        $config = (new GenerationConfig())
-        ->withCandidateCount(1);
+        
+        $config = $this->model
+            ->getGenerationConfig()
+            ->withCandidateCount(1);
+        
         $response = $this->model
             ->withGenerationConfig($config)
             ->generateContentWithContents($this->history);
@@ -64,9 +66,11 @@ class ChatSession
 
             $callback($response);
         };
-
-        $config = (new GenerationConfig())
+        
+        $config = $this->model
+            ->getGenerationConfig()
             ->withCandidateCount(1);
+        
         $this->model
             ->withGenerationConfig($config)
             ->generateContentStreamWithContents($partsCollectorCallback, $this->history);
