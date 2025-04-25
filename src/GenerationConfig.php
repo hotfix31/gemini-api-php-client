@@ -12,6 +12,8 @@ class GenerationConfig implements JsonSerializable
 {
     use ArrayTypeValidator;
 
+    private const MAX_THINKING_BUDGET = 24576;
+
     /** @var array{
      *     candidateCount?: int,
      *     stopSequences?: string[],
@@ -22,8 +24,11 @@ class GenerationConfig implements JsonSerializable
      *     responseMimeType?: string,
      *     responseSchema?: array{
      *         type: string,
-     *         schema: array,
+     *         schema: array<string, mixed>,
      *     }[],
+     *     thinkingConfig?: array{
+     *         thinkingBudget: int,
+     *     },
      * }
      */
     private array $config;
@@ -113,13 +118,29 @@ class GenerationConfig implements JsonSerializable
     /**
      * @param array{
      *     type: string,
-     *     schema: array,
+     *     schema: array<string, mixed>,
      * }[] $responseSchema
      */
     public function withResponseSchema(array $responseSchema): self
     {
         $clone = clone $this;
         $clone->config['responseSchema'] = $responseSchema;
+
+        return $clone;
+    }
+
+    public function withThinkingConfig(int $thinkingBudget): self
+    {
+        if ($thinkingBudget < 0) {
+            throw new UnexpectedValueException('Thinking budget is negative');
+        }
+
+        if ($thinkingBudget > self::MAX_THINKING_BUDGET) {
+            throw new UnexpectedValueException('Thinking budget is more than ' . self::MAX_THINKING_BUDGET);
+        }
+
+        $clone = clone $this;
+        $clone->config['thinkingConfig'] = ['thinkingBudget' => $thinkingBudget];
 
         return $clone;
     }
@@ -135,8 +156,11 @@ class GenerationConfig implements JsonSerializable
      *      responseMimeType?: string,
      *      responseSchema?: array{
      *          type: string,
-     *          schema: array,
+     *          schema: array<string, mixed>,
      *      }[],
+     *     thinkingConfig?: array{
+     *         thinkingBudget: int,
+     *     },
      * }
      */
     public function jsonSerialize(): array
