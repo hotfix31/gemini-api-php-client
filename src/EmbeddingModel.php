@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace GeminiAPI;
 
-use GeminiAPI\Enums\ModelName;
 use GeminiAPI\Enums\Role;
 use GeminiAPI\Enums\TaskType;
 use GeminiAPI\Requests\EmbedContentRequest;
@@ -19,7 +18,7 @@ class EmbeddingModel
 
     public function __construct(
         private readonly Client $client,
-        public readonly ModelName|string $modelName,
+        public readonly string $modelName,
     ) {
     }
 
