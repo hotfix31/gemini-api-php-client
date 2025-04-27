@@ -4,6 +4,6 @@ declare(strict_types=1);
 
 namespace GeminiAPI\Resources\Parts;
 
-interface PartInterface
+interface PartInterface extends \JsonSerializable
 {
 }

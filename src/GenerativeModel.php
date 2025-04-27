@@ -13,8 +13,7 @@ use GeminiAPI\Responses\CountTokensResponse;
 use GeminiAPI\Responses\GenerateContentResponse;
 use GeminiAPI\Resources\Content;
 use GeminiAPI\Resources\Parts\PartInterface;
-use GeminiAPI\Resources\Tool;
-use GeminiAPI\Resources\GoogleSearch;
+use GeminiAPI\Resources\Tools\ToolInterface;
 use GeminiAPI\Traits\ArrayTypeValidator;
 use Psr\Http\Client\ClientExceptionInterface;
 
@@ -29,7 +28,7 @@ class GenerativeModel
 
     private ?Content $systemInstruction = null;
 
-    /** @var list<Tool|GoogleSearch> */
+    /** @var list<ToolInterface> */
     private array $tools = [];
 
     public function __construct(
@@ -159,12 +158,11 @@ class GenerativeModel
         return $clone;
     }
 
-    public function withTool(Tool|GoogleSearch $tool): self
+    public function withTool(ToolInterface $tool): self
     {
         $clone = clone $this;
         $clone->tools[] = $tool;
 
         return $clone;
     }
-
 }

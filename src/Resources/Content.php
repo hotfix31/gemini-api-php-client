@@ -13,8 +13,9 @@ use GeminiAPI\Resources\Parts\PartInterface;
 use GeminiAPI\Resources\Parts\TextPart;
 use GeminiAPI\Resources\Parts\FunctionCallPart;
 use GeminiAPI\Resources\Parts\FunctionResponsePart;
+use GeminiAPI\Resources\Parts\CodeResponsePart;
 
-class Content
+class Content implements \JsonSerializable
 {
     use ArrayTypeValidator;
 
@@ -144,7 +145,14 @@ class Content
 
     /**
      * @param array{
-     *     parts: array<int, array{text?: string, inlineData?: array{mimeType: string, data: string}}>,
+     *     parts: array<int, array{
+     *         text?: string,
+     *         inlineData?: array{mimeType: string, data: string},
+     *         functionCall?: array{name: string, args: array},
+     *         functionResponse?: array{name: string, response: array},
+     *         executable_code?: array{language: string, code: string},
+     *         code_execution_result?: array{outcome: string, output: string}
+     *     }>,
      *     role: string,
      * } $content
      * @return self
@@ -153,21 +161,30 @@ class Content
     {
         $parts = [];
         foreach ($content['parts'] as $part) {
+            if (!empty($part['executable_code']) || !empty($part['code_execution_result'])) {
+                $parts[] = CodeResponsePart::fromArray($part);
+                continue;
+            }
+
             if (!empty($part['text'])) {
                 $parts[] = new TextPart($part['text']);
+                continue;
             }
 
             if (!empty($part['functionCall'])) {
                 $parts[] = new FunctionCallPart($part['functionCall']['name'], $part['functionCall']['args']);
+                continue;
             }
 
             if (!empty($part['functionResponse'])) {
                 $parts[] = new FunctionResponsePart(['name' => $part['functionResponse']['name'], 'response' => $part['functionResponse']['response']]);
+                continue;
             }
 
             if (!empty($part['inlineData'])) {
                 $mimeType = MimeType::from($part['inlineData']['mimeType']);
                 $parts[] = new FilePart($mimeType, $part['inlineData']['data']);
+                continue;
             }
         }
 
@@ -175,5 +192,13 @@ class Content
             $parts,
             Role::from($content['role']),
         );
+    }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'parts' => $this->parts,
+            'role' => $this->role,
+        ];
     }
 }

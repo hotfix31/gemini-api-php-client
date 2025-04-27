@@ -72,4 +72,23 @@ trait ArrayTypeValidator
             }
         }
     }
+
+    /**
+     * @param array<int, mixed> $items
+     * @return void
+     * @throws InvalidArgumentException
+     */
+    private function ensureArrayOfInt(array $items): void
+    {
+        foreach ($items as $item) {
+            if (!is_int($item)) {
+                throw new InvalidArgumentException(
+                    sprintf(
+                        'Expected int but found %s',
+                        is_object($item) ? $item::class : gettype($item),
+                    ),
+                );
+            }
+        }
+    }
 }

@@ -4,33 +4,22 @@ declare(strict_types=1);
 
 namespace GeminiAPI\Resources\Parts;
 
-use JsonSerializable;
+use Stringable;
 
 use function json_encode;
 
-class FunctionResponsePart implements PartInterface, JsonSerializable
+class FunctionResponsePart implements PartInterface, Stringable
 {
     public function __construct(
         public readonly array $functionResponse,
     ) {
     }
 
-    /**
-     * @return array{
-     *     functionResponse: array,
-     * }
-     */
     public function jsonSerialize(): array
     {
         return [
-            'functionResponse' =>
-            [
-                'name' => $this->functionResponse['name'],
-                'response' => [
-                    'name' => $this->functionResponse['name'],
-                    'content' => $this->functionResponse['response'],
-                ],
-            ]
+            'name' => $this->functionResponse['name'],
+            'response' => $this->functionResponse['response'],
         ];
     }
 

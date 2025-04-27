@@ -8,6 +8,8 @@ use GeminiAPI\Enums\FinishReason;
 use GeminiAPI\Enums\Role;
 use GeminiAPI\Traits\ArrayTypeValidator;
 use UnexpectedValueException;
+use GeminiAPI\Resources\GroundingWebSearch\GroundingAttribution;
+use GeminiAPI\Resources\GroundingWebSearch\GroundingMetadata;
 
 /**
  * @phpstan-import-type CandidateResponse from \GeminiAPI\Responses\GenerateContentResponse
@@ -23,6 +25,10 @@ class Candidate
      * @param SafetyRating[] $safetyRatings
      * @param int $tokenCount
      * @param int $index
+     * @param GroundingAttribution[] $groundingAttributions
+     * @param GroundingMetadata $groundingMetadata
+     * @param float $avgLogprobs
+     * @param LogprobsResult $logprobsResult
      */
     public function __construct(
         public readonly Content $content,
@@ -31,6 +37,10 @@ class Candidate
         public readonly array $safetyRatings,
         public readonly int $tokenCount,
         public readonly int $index,
+        public readonly array $groundingAttributions = [],
+        public readonly ?GroundingMetadata $groundingMetadata = null,
+        public readonly ?float $avgLogprobs = null,
+        public readonly ?LogprobsResult $logprobsResult = null,
     ) {
         if ($tokenCount < 0) {
             throw new UnexpectedValueException('tokenCount cannot be negative');
@@ -41,6 +51,7 @@ class Candidate
         }
 
         $this->ensureArrayOfType($safetyRatings, SafetyRating::class);
+        $this->ensureArrayOfType($groundingAttributions, GroundingAttribution::class);
     }
 
     /**
@@ -49,15 +60,6 @@ class Candidate
      */
     public static function fromArray(array $candidate): self
     {
-        $citationMetadata = isset($candidate['citationMetadata'])
-            ? CitationMetadata::fromArray($candidate['citationMetadata'])
-            : new CitationMetadata();
-
-        $safetyRatings = array_map(
-            static fn (array $rating): SafetyRating => SafetyRating::fromArray($rating),
-            $candidate['safetyRatings'] ?? [],
-        );
-
         $content = isset($candidate['content'])
             ? Content::fromArray($candidate['content'])
             : Content::text('', Role::Model);
@@ -66,6 +68,28 @@ class Candidate
             ? FinishReason::from($candidate['finishReason'])
             : FinishReason::OTHER;
 
+        $safetyRatings = array_map(
+            static fn (array $rating): SafetyRating => SafetyRating::fromArray($rating),
+            $candidate['safetyRatings'] ?? [],
+        );
+
+        $citationMetadata = isset($candidate['citationMetadata'])
+            ? CitationMetadata::fromArray($candidate['citationMetadata'])
+            : new CitationMetadata();
+
+        $groundingAttributions = array_map(
+            static fn (array $attribution): GroundingAttribution => GroundingAttribution::fromArray($attribution),
+            $candidate['groundingAttributions'] ?? [],
+        );
+
+        $groundingMetadata = isset($candidate['groundingMetadata'])
+            ? GroundingMetadata::fromArray($candidate['groundingMetadata'])
+            : null;
+
+        $logprobsResult = isset($candidate['logprobsResult'])
+            ? LogprobsResult::fromArray($candidate['logprobsResult'])
+            : null;
+
         return new self(
             $content,
             $finishReason,
@@ -73,6 +97,10 @@ class Candidate
             $safetyRatings,
             $candidate['tokenCount'] ?? 0,
             $candidate['index'] ?? 0,
+            $groundingAttributions,
+            $groundingMetadata,
+            $candidate['avgLogprobs'] ?? null,
+            $logprobsResult,
         );
     }
 }

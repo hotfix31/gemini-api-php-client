@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace GeminiAPI\Resources\Parts;
 
-use JsonSerializable;
-
 use function json_encode;
+use Stringable;
 
-class TextPart implements PartInterface, JsonSerializable
+class TextPart implements PartInterface, Stringable
 {
     public function __construct(
         public readonly string $text,

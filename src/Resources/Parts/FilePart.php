@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace GeminiAPI\Resources\Parts;
 
 use GeminiAPI\Enums\MimeType;
-use JsonSerializable;
+use Stringable;
 
 use function json_encode;
 
-class FilePart implements PartInterface, JsonSerializable
+class FilePart implements PartInterface, Stringable
 {
     public function __construct(
         public readonly MimeType $mimeType,

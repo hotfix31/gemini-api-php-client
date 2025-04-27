@@ -29,6 +29,7 @@ class GenerationConfig implements JsonSerializable
      *     thinkingConfig?: array{
      *         thinkingBudget: int,
      *     },
+     *     responseModalities?: string[],
      * }
      */
     private array $config;
@@ -146,6 +147,20 @@ class GenerationConfig implements JsonSerializable
     }
 
     /**
+     * @param string[] $responseModalities
+     * @return $this
+     */
+    public function withResponseModalities(array $responseModalities): self
+    {
+        $this->ensureArrayOfString($responseModalities);
+
+        $clone = clone $this;
+        $clone->config['responseModalities'] = $responseModalities;
+
+        return $clone;
+    }
+
+    /**
      * @return array{
      *      candidateCount?: int,
      *      stopSequences?: string[],
@@ -161,6 +176,7 @@ class GenerationConfig implements JsonSerializable
      *     thinkingConfig?: array{
      *         thinkingBudget: int,
      *     },
+     *     responseModalities?: string[],
      * }
      */
     public function jsonSerialize(): array

@@ -14,47 +14,68 @@ use GeminiAPI\Resources\PromptFeedback;
 use ValueError;
 
 /**
+ * Response from the GenerateContent API endpoint.
+ * 
+ * This class represents the response from the Gemini API when generating content.
+ * It contains the generated candidates, feedback on the prompt, usage metadata, and model version.
+ * 
+ * @see https://ai.google.dev/api/rest/v1beta/models/generateContent
+ * 
+ * @phpstan-type CitationSource = array{
+ *   startIndex?: int|null,
+ *   endIndex?: int|null,
+ *   uri?: string|null,
+ *   license?: string|null
+ * }
+ * 
+ * @phpstan-type CitationMetadata = array{
+ *   citationSources: array<int, CitationSource>
+ * }
+ * 
+ * @phpstan-type SafetyRating = array{
+ *   category: string,
+ *   probability: string,
+ *   blocked: bool|null
+ * }
+ * 
+ * @phpstan-type InlineData = array{
+ *   mimeType: string,
+ *   data: string
+ * }
+ * 
+ * @phpstan-type FunctionCall = array{
+ *   name: string,
+ *   arguments: array<string, mixed>
+ * }
+ * 
+ * @phpstan-type Part = array{
+ *   text?: string,
+ *   inlineData?: InlineData,
+ *   functionCall?: FunctionCall
+ * }
+ * 
+ * @phpstan-type Content = array{
+ *   parts: array<int, Part>,
+ *   role: string
+ * }
+ * 
  * @phpstan-type CandidateResponse = array{
- *   citationMetadata: array{
- *     citationSources: array<int, array{
- *       startIndex?: int|null,
- *       endIndex?: int|null,
- *       uri?: string|null,
- *       license?: string|null
- *     }>
- *   },
- *   safetyRatings: array<int, array{
- *     category: string,
- *     probability: string,
- *     blocked: bool|null
- *   }>,
- *   content: array{
- *     parts: array<int, array{
- *       text?: string,
- *       inlineData?: array{
- *         mimeType: string,
- *         data: string
- *       },
- *       functionCall?: array{
- *         name: string,
- *         arguments: array<string, mixed>
- *       },
- *     }>,
- *     role: string
- *   },
+ *   citationMetadata: CitationMetadata,
+ *   safetyRatings: array<int, SafetyRating>,
+ *   content: Content,
  *   finishReason: string,
  *   index: int
- *  }
+ * }
  */
 class GenerateContentResponse
 {
     use ArrayTypeValidator;
 
     /**
-     * @param Candidate[] $candidates
-     * @param ?PromptFeedback $promptFeedback
-     * @param ?UsageMetadata $usageMetadata
-     * @param string $modelVersion
+     * @param Candidate[] $candidates The generated content candidates
+     * @param ?PromptFeedback $promptFeedback Feedback about the prompt
+     * @param ?UsageMetadata $usageMetadata Metadata about token usage
+     * @param string $modelVersion The version of the model used
      */
     public function __construct(
         public readonly array $candidates,
@@ -66,7 +87,10 @@ class GenerateContentResponse
     }
 
     /**
-     * @return PartInterface[]
+     * Get all parts from the first candidate.
+     * 
+     * @return PartInterface[] Array of parts from the first candidate
+     * @throws ValueError If no candidates are available or if there are multiple candidates
      */
     public function parts(): array
     {
@@ -89,6 +113,12 @@ class GenerateContentResponse
         return $this->candidates[0]->content->parts;
     }
 
+    /**
+     * Get the text content from the first candidate.
+     * 
+     * @return string The text content
+     * @throws ValueError If the response contains multiple parts or non-text parts
+     */
     public function text(): string
     {
         $parts = $this->parts();
@@ -106,6 +136,12 @@ class GenerateContentResponse
         return $parts[0]->text;
     }
 
+    /**
+     * Get the function call from the first candidate.
+     * 
+     * @return array{name: string, arguments: array<string, mixed>} The function call data
+     * @throws ValueError If the response contains multiple parts or non-function call parts
+     */
     public function functionCall(): array
     {
         $parts = $this->parts();
@@ -134,6 +170,8 @@ class GenerateContentResponse
     }
 
     /**
+     * Creates a new instance from an array of data.
+     * 
      * @param array{
      *  promptFeedback: array{
      *   blockReason: string|null,
@@ -151,7 +189,7 @@ class GenerateContentResponse
      *    thoughtsTokenCount: int,
      *  },
      *  modelVersion: string,
-     * } $array
+     * } $array The data to create the instance from
      * @return self
      */
     public static function fromArray(array $array): self
